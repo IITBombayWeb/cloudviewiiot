@@ -1,0 +1,38 @@
+version: '3.6'
+services:
+  influxdb:
+    image: influxdb:2.5.1-alpine
+    container_name: influxdb
+    restart: unless-stopped
+    networks:
+      - iotawatt_monitoring
+    ports:
+      - '8086:8086'
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana-server
+    restart: unless-stopped
+    networks:
+      - iotawatt_monitoring
+    depends_on:
+      - influxdb
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin1234 #change the password
+      - GF_INSTALL_PLUGINS=
+    links:
+      - influxdb
+    ports:
+      - '3000:3000'
+    volumes:
+      - grafana_data:/var/lib/grafana
+      
+networks:
+  iotawatt_monitoring:
+ 
+volumes:
+  grafana_data:
+  influxdb_data:
